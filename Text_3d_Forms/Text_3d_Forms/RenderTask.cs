@@ -5,7 +5,7 @@ using System.Security.Permissions;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Text_3d_Forms
+namespace Text_3D_Engine
 {
 
 }

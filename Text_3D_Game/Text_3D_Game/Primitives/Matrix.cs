@@ -4,43 +4,61 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Text_3D_Renderer.Rendering
+namespace Text_3D_Renderer
 {
     /// <summary>
     /// A columnwise 4x4 matrix for representing transformation and other data in a 3d space
     /// </summary>
-    public class Matrix : ICloneable
+    public class Matrix4 : ICloneable
     {
         private double[][] array;
 
+        /// <summary>
+        /// If this has position data, this is the X value
+        /// </summary>
         public double X
         {
             get { return array[3][0]; }
             set { array[3][0] = value; }
         }
 
+        /// <summary>
+        /// If this has position data, this is the Y value
+        /// </summary>
         public double Y
         {
             get { return array[3][1]; }
             set { array[3][1] = value; }
         }
 
+        /// <summary>
+        /// If this has position data, this is the Z value
+        /// </summary>
         public double Z
         {
             get { return array[3][2]; }
             set { array[3][2] = value; }
         }
 
+        /// <summary>
+        /// If this has rotation data, this is its pitch radians.
+        /// </summary>
         public double Pitch
         {
             get { return Math.Atan2(array[0][2], array[1][2]); }
         }
 
+        /// <summary>
+        /// If this has rotation data, this is its yaw radians.
+        /// </summary>
         public double Yaw
         {
             get { return Math.Acos(array[2][2]); }
         }
 
+        /// <summary>
+        /// If this has rotation data, this is its roll radians.
+        /// </summary>
         public double Roll
         {
             get { return Math.Atan2(array[2][0], array[2][1]); }
@@ -77,25 +95,33 @@ namespace Text_3D_Renderer.Rendering
             }
         }
 
-        public Matrix() : this(new double[] { 1, 0, 0, 0 }, new double[] { 0, 1, 0, 0 }, new double[] { 0, 0, 1, 0 }, new double[] { 0, 0, 0, 1 }) { }
+        /// <summary>
+        /// Creates a new identity matrix
+        /// </summary>
+        public Matrix4() : this(new double[] { 1, 0, 0, 0 }, new double[] { 0, 1, 0, 0 }, new double[] { 0, 0, 1, 0 }, new double[] { 0, 0, 0, 1 }) { }
 
-        public Matrix(Vector3 right, Vector3 up, Vector3 forward, Vector3 pos) : this(
-            new double[] { right.X, right.Y, right.Z, 0 },
-            new double[] { up.X, up.Y, up.Z, 0 },
-            new double[] { forward.X, forward.Y, forward.Z, 0 },
-            new double[] { pos.X, pos.Y, pos.Z, pos.W })
-        { }
-
-        public Matrix(double[] col1, double[] col2, double[] col3, double[] col4)
+        /// <summary>
+        /// Creates a new matrix from four columns
+        /// </summary>
+        /// <param name="col1"></param>
+        /// <param name="col2"></param>
+        /// <param name="col3"></param>
+        /// <param name="col4"></param>
+        public Matrix4(double[] col1, double[] col2, double[] col3, double[] col4)
         {
             array = new double[][] { col1, col2, col3, col4 };
         }
 
-        public Matrix(Vector3 vec) : this(new double[] { 1, 0, 0, 0 }, new double[] { 0, 1, 0, 0 }, new double[] { 0, 0, 1, 0 }, new double[] { vec.X, vec.Y, vec.Z, vec.W }) { }
-
-        public Matrix(double[][] array)
+        /// <summary>
+        /// Creates a new matrix from a columnwise 4x4 array of doubles.
+        /// </summary>
+        /// <param name="array"></param>
+        public Matrix4(double[][] array)
         {
-            this.array = array;
+            if (array.Length == 4 && array[0].Length == 4)
+            {
+                this.array = array;
+            }
         }
 
         /// <summary>
@@ -104,9 +130,9 @@ namespace Text_3D_Renderer.Rendering
         /// <param name="m1"></param>
         /// <param name="m2"></param>
         /// <returns></returns>
-        public static Matrix Multiply(Matrix m1, Matrix m2)
+        public static Matrix4 Multiply(Matrix4 m1, Matrix4 m2)
         {
-            Matrix output = new Matrix();
+            Matrix4 output = new Matrix4();
 
             
             for(byte i = 0; i < 4; ++i)
@@ -119,6 +145,11 @@ namespace Text_3D_Renderer.Rendering
                         multresult += m1.array[k][j] * m2.array[i][k];
                     }
                     output.array[i][j] = multresult;
+
+                    if(multresult.ToString() == "NaN")
+                    {
+                        Console.WriteLine("Matrix multiplication error");
+                    }
                 }
             }
             return output;
@@ -130,7 +161,7 @@ namespace Text_3D_Renderer.Rendering
         /// <param name="vec"></param>
         /// <param name="m1"></param>
         /// <returns></returns>
-        public static Vector3 MultiplyVector(Vector3 vec, Matrix m1)
+        public static Vector3 MultiplyVector(Vector3 vec, Matrix4 m1)
         {
             double[] m2 = new double[] { vec.X, vec.Y, vec.Z, vec.W };
             double[] output = new double[4];
@@ -144,21 +175,32 @@ namespace Text_3D_Renderer.Rendering
                 output[i] = result;
             }
 
-            return new Vector3(output[0] / output[3], output[1] / output[3], output[2] / output[3], output[3] == 1 ? true : false);
+            if(output[3] != 0)
+            {
+                return new Vector3(output[0] / output[3], output[1] / output[3], output[2] / output[3], (int)output[3]);
+            }
+            else
+            {
+                return new Vector3(output[0], output[1], output[2], (int)output[3]);
+            }
         }
 
         /// <summary>
         /// Sets all values in the matrix to 0
         /// </summary>
-        public Matrix clear()
+        public Matrix4 clear()
         {
             array = array = new double[][] { new double[4], new double[4], new double[4], new double[4] };
             return this;
         }
 
+        /// <summary>
+        /// Deeply clones the matrix
+        /// </summary>
+        /// <returns></returns>
         public object Clone()
         {
-            return new Matrix(
+            return new Matrix4(
                 new double[] { array[0][0], array[0][1], array[0][2], array[0][3] }, 
                 new double[] { array[1][0], array[1][1], array[1][2], array[1][3] }, 
                 new double[] { array[2][0], array[2][1], array[2][2], array[2][3] }, 
@@ -171,7 +213,7 @@ namespace Text_3D_Renderer.Rendering
         /// </summary>
         /// <param name="m2"></param>
         /// <returns></returns>
-        public Matrix multiplyBy(Matrix m2)
+        public Matrix4 multiplyBy(Matrix4 m2)
         {
             return Multiply(this, m2);
         }
@@ -181,7 +223,7 @@ namespace Text_3D_Renderer.Rendering
         /// </summary>
         /// <param name="vec"></param>
         /// <returns></returns>
-        public Matrix transformBy(Vector3 vec)
+        public Matrix4 transformBy(Vector3 vec)
         {
             double[] vecArray = new double[] { vec.X, vec.Y, vec.Z };
             for (byte i = 0; i < 3; ++i)
@@ -198,9 +240,9 @@ namespace Text_3D_Renderer.Rendering
         /// Returns the inverse matrix
         /// </summary>
         /// <returns></returns>
-        public Matrix inverse()
+        public Matrix4 Inverse()
         {
-            return new Matrix().newFromRowwise(MatrixInverter.MatrixInverse(getRowwise()));
+            return new Matrix4().newFromRowwise(MatrixInverter.MatrixInverse(getRowwise()));
         }
         
         /// <summary>
@@ -228,7 +270,7 @@ namespace Text_3D_Renderer.Rendering
         /// </summary>
         /// <param name="input"></param>
         /// <returns></returns>
-        public Matrix newFromRowwise(double[][] input)
+        public Matrix4 newFromRowwise(double[][] input)
         {
             for(byte i = 0; i < 4; ++i)
             {
@@ -241,12 +283,44 @@ namespace Text_3D_Renderer.Rendering
             return this;
         }
 
-        public static Matrix operator *(Matrix m1, Matrix m2)
+        /// <summary>
+        /// Get this Matrix as a position vector
+        /// </summary>
+        /// <returns></returns>
+        public Vector3 ToVector()
+        {
+            return new Vector3(X, Y, Z);
+        }
+
+        /// <summary>
+        /// Multiplies two matrices together
+        /// </summary>
+        /// <param name="m1"></param>
+        /// <param name="m2"></param>
+        /// <returns></returns>
+        public static Matrix4 operator *(Matrix4 m1, Matrix4 m2)
         {
             return Multiply(m1, m2);
         }
 
-        public static Vector3 operator *(Vector3 v, Matrix m1)
+        /// <summary>
+        /// Multiplies a vector by a matrix
+        /// </summary>
+        /// <param name="v"></param>
+        /// <param name="m1"></param>
+        /// <returns></returns>
+        public static Vector3 operator *(Vector3 v, Matrix4 m1)
+        {
+            return MultiplyVector(v, m1);
+        }
+
+        /// <summary>
+        /// Multiplies a vector by a matrix
+        /// </summary>
+        /// <param name="v"></param>
+        /// <param name="m1"></param>
+        /// <returns></returns>
+        public static Vector3 operator *(Matrix4 m1, Vector3 v)
         {
             return MultiplyVector(v, m1);
         }

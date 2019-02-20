@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Text_3D_Renderer.Rendering;
 
-namespace Text_3D_Renderer.Primitives
+namespace Text_3D_Renderer
 {
     /// <summary>
     /// Represents a rotation in 3d space.
@@ -41,17 +41,17 @@ namespace Text_3D_Renderer.Primitives
             qw *= n;
         }
 
-        public Matrix toMatrix()
+        public Matrix4 toMatrix()
         {
             normalize();
-            return Matrix.Multiply(
-                new Matrix(
+            return Matrix4.Multiply(
+                new Matrix4(
                     new double[] { qw, -qz, qy, -qx }, 
                     new double[] { qz, qw, -qx, -qy }, 
                     new double[] { -qy, qx, qw, -qz },
                     new double[] { qx, qy, qz, qw }
                     ), 
-                new Matrix(
+                new Matrix4(
                     new double[] { qw, -qz, qy, qx }, 
                     new double[] { qz, qw, -qx, qy }, 
                     new double[] { -qy, qx, qw, qz }, 

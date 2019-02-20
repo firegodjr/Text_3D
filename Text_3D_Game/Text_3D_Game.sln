@@ -3,9 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
 VisualStudioVersion = 14.0.24720.0
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Text_3D_Game", "Text_3D_Game\Text_3D_Game.csproj", "{23EEF11F-FBAB-4870-850E-B49C2ED7904C}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Text_3D_Renderer", "Text_3D_Game\Text_3D_Renderer.csproj", "{23EEF11F-FBAB-4870-850E-B49C2ED7904C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Text_3d_Forms", "..\Text_3d_Forms\Text_3d_Forms\Text_3d_Forms.csproj", "{1C1889B2-7DFC-4937-8980-238CAA1A57C5}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Text_3D_Engine", "..\Text_3d_Forms\Text_3d_Forms\Text_3D_Engine.csproj", "{1C1889B2-7DFC-4937-8980-238CAA1A57C5}"
 	ProjectSection(ProjectDependencies) = postProject
 		{23EEF11F-FBAB-4870-850E-B49C2ED7904C} = {23EEF11F-FBAB-4870-850E-B49C2ED7904C}
 	EndProjectSection
